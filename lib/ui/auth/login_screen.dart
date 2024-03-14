@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_final_fields, unused_field, unnecessary_import, deprecated_member_use, avoid_print, unnecessary_null_comparison
 
 //import 'package:firebase_app/notification_services.dart';
+import 'package:firebase_app/ui/auth/login_with_phone_number.dart';
 import 'package:firebase_app/ui/auth/posts/posts_screen.dart';
 import 'package:firebase_app/ui/auth/sign_up_screen.dart';
 import 'package:firebase_app/utils/utils.dart';
@@ -42,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
           context, MaterialPageRoute(builder: (context) => const PostScreen()));
     }).onError((error, stackTrace) {
       Utils().toastMessage(error.toString());
-       setState(() {
+      setState(() {
         _isLoading = false;
       });
     });
@@ -171,6 +172,28 @@ class _LoginScreenState extends State<LoginScreen> {
                               TextStyle(color: Colors.lightBlue, fontSize: 16),
                         ))
                   ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const LoginWithPhoneNumber()));
+                  },
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(50))),
+                    child: const Center(
+                      child: Text('Login with mobile'),
+                    ),
+                  ),
                 )
               ],
             ),
