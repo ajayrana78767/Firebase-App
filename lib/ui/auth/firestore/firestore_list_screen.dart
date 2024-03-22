@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app/ui/auth/firestore/add_firestore_data.dart';
 import 'package:firebase_app/ui/auth/login_screen.dart';
+import 'package:firebase_app/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -15,8 +16,10 @@ class FireStoreScreen extends StatefulWidget {
 class _FireStoreScreenState extends State<FireStoreScreen> {
   @override
   final auth = FirebaseAuth.instance;
-  final fireStore = FirebaseFirestore.instance.collection('users').snapshots();
   final editController = TextEditingController();
+  final fireStore = FirebaseFirestore.instance.collection('users').snapshots();
+  CollectionReference ref = FirebaseFirestore.instance.collection('users');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,19 +70,62 @@ class _FireStoreScreenState extends State<FireStoreScreen> {
               stream: fireStore,
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.connectionState== ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    if (snapshot.hasError) {
-                      return const Text('error');
-                    }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                if (snapshot.hasError) {
+                  return const Text('error');
+                }
                 return Expanded(
                   child: ListView.builder(
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
-                        return  ListTile(
-                          title: Text(snapshot.data!.docs[index]["title"].toString()),
-                          subtitle:Text(snapshot.data!.docs[index]["id"].toString()),
+                        final title =
+                            snapshot.data!.docs[index]["title"].toString();
+                        return ListTile(
+                          onTap: () {
+                            // ref.doc(snapshot.data!.docs[index]["id"].toString()).update({
+                            //   'title':''
+                            // });
+                          },
+                          title: Text(
+                              snapshot.data!.docs[index]["title"].toString()),
+                          subtitle:
+                              Text(snapshot.data!.docs[index]["id"].toString()),
+                          trailing: PopupMenuButton(
+                              itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                        value: 1,
+                                        child: ListTile(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                            showMyDialog(
+                                              title,
+                                              snapshot.data!.docs[index]["id"]
+                                                  .toString(),
+                                            );
+                                            // showMyDialog(
+                                            //     ,
+                                            //     snapshot
+                                            //         .child('id')
+                                            //         .value
+                                            //         .toString()); // Call showMyDialog() when the menu item is tapped
+                                          },
+                                          leading: const Icon(Icons.edit),
+                                          title: const Text('Edit'),
+                                        )),
+                                    PopupMenuItem(
+                                        value: 1,
+                                        child: ListTile(
+                                          onTap: () {
+                                             ref.doc(snapshot.data!.docs[index]["id"].toString()).delete();
+                                            Navigator.pop(context);
+                                            
+                                          },
+                                          leading: const Icon(Icons.delete),
+                                          title: const Text('Delete'),
+                                        )),
+                                  ]),
                         );
                       }),
                 );
@@ -111,6 +157,13 @@ class _FireStoreScreenState extends State<FireStoreScreen> {
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    ref.doc(id).update({
+                      'title': editController.text.toString(),
+                    }).then((value) {
+                      Utils().toastMessage('Post Updated');
+                    }).onError((error, stackTrace) {
+                      Utils().toastMessage(error.toString());
+                    });
                   },
                   child: const Text('Update')),
             ],
