@@ -18,10 +18,12 @@ class PostScreen extends StatefulWidget {
 class _PostScreenState extends State<PostScreen> {
   final auth = FirebaseAuth.instance;
   final ref = FirebaseDatabase.instance.ref('Post');
+  final searchFilter = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.lightBlue,
         title: const Text(
           "Post Screen",
@@ -58,32 +60,45 @@ class _PostScreenState extends State<PostScreen> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: StreamBuilder(
-              stream: ref.onValue,
-              // initialData: initialData,
-              builder: (BuildContext context,
-                  AsyncSnapshot<DatabaseEvent> snapshot) {
-                   
-                if (!snapshot.hasData) {
-                  return const CircularProgressIndicator();
-                } else {
-                   Map<dynamic, dynamic> map=snapshot.data!.snapshot.value as dynamic;
-                   var List=<dynamic>[];
-                      List.clear();
-                      List=map.values.toList();
-                  return ListView.builder(
-                      itemCount: snapshot.data!.snapshot.children.length,
-                      itemBuilder: (context, index) {
-                        return  ListTile(
-                          title: Text(List[index]['Title']),
-                          subtitle: Text(List[index]['id']),
-                        );
-                      });
-                }
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextFormField(
+              controller: searchFilter,
+              decoration: const InputDecoration(
+                hintText: "Search",
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                setState(() {});
               },
             ),
           ),
+          // Expanded(
+          //   child: StreamBuilder(
+          //     stream: ref.onValue,
+          //     // initialData: initialData,
+          //     builder: (BuildContext context,
+          //         AsyncSnapshot<DatabaseEvent> snapshot) {
+
+          //       if (!snapshot.hasData) {
+          //         return const CircularProgressIndicator();
+          //       } else {
+          //          Map<dynamic, dynamic> map=snapshot.data!.snapshot.value as dynamic;
+          //          var List=<dynamic>[];
+          //             List.clear();
+          //             List=map.values.toList();
+          //         return ListView.builder(
+          //             itemCount: snapshot.data!.snapshot.children.length,
+          //             itemBuilder: (context, index) {
+          //               return  ListTile(
+          //                 title: Text(List[index]['Title']),
+          //                 subtitle: Text(List[index]['id']),
+          //               );
+          //             });
+          //       }
+          //     },
+          //   ),
+          // ),
           Expanded(
             child: FirebaseAnimatedList(
                 shrinkWrap: true,
@@ -93,10 +108,22 @@ class _PostScreenState extends State<PostScreen> {
                   color: Colors.lightBlue,
                 )),
                 itemBuilder: (context, snapshot, animation, index) {
-                  return ListTile(
-                    title: Text(snapshot.child('Title').value.toString()),
-                    subtitle: Text(snapshot.child('id').value.toString()),
-                  );
+                  final title = snapshot.child('Title').value.toString();
+                  if (searchFilter.text.isEmpty) {
+                    return ListTile(
+                      title: Text(snapshot.child('Title').value.toString()),
+                      subtitle: Text(snapshot.child('id').value.toString()),
+                    );
+                  } else if (title
+                      .toLowerCase()
+                      .contains(searchFilter.text.toLowerCase().toString())) {
+                    return ListTile(
+                      title: Text(snapshot.child('Title').value.toString()),
+                      subtitle: Text(snapshot.child('id').value.toString()),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
                 }),
           ),
         ],
