@@ -1,6 +1,6 @@
 // ignore_for_file: non_constant_identifier_names, unused_local_variable
 
-import 'dart:math';
+//import 'dart:math';
 
 import 'package:firebase_app/ui/auth/login_screen.dart';
 import 'package:firebase_app/ui/auth/posts/add_posts.dart';
@@ -134,11 +134,15 @@ class _PostScreenState extends State<PostScreen> {
                                       leading: const Icon(Icons.edit),
                                       title: const Text('Edit'),
                                     )),
-                                const PopupMenuItem(
+                                 PopupMenuItem(
                                     value: 1,
                                     child: ListTile(
-                                      leading: Icon(Icons.delete),
-                                      title: Text('Delete'),
+                                      onTap:(){
+                                         Navigator.pop(context);
+                                         ref.child(snapshot.child('id').value.toString()).remove();
+                                      } ,
+                                      leading: const Icon(Icons.delete),
+                                      title: const Text('Delete'),
                                     )),
                               ]),
                     );
