@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, unused_local_variable
+
 import 'package:firebase_app/ui/auth/login_screen.dart';
 import 'package:firebase_app/ui/auth/posts/add_posts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -57,11 +59,39 @@ class _PostScreenState extends State<PostScreen> {
       body: Column(
         children: [
           Expanded(
-            
+            child: StreamBuilder(
+              stream: ref.onValue,
+              // initialData: initialData,
+              builder: (BuildContext context,
+                  AsyncSnapshot<DatabaseEvent> snapshot) {
+                   
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                } else {
+                   Map<dynamic, dynamic> map=snapshot.data!.snapshot.value as dynamic;
+                   var List=<dynamic>[];
+                      List.clear();
+                      List=map.values.toList();
+                  return ListView.builder(
+                      itemCount: snapshot.data!.snapshot.children.length,
+                      itemBuilder: (context, index) {
+                        return  ListTile(
+                          title: Text(List[index]['Title']),
+                          subtitle: Text(List[index]['id']),
+                        );
+                      });
+                }
+              },
+            ),
+          ),
+          Expanded(
             child: FirebaseAnimatedList(
-              shrinkWrap: true,
+                shrinkWrap: true,
                 query: ref,
-                defaultChild: const Center(child: CircularProgressIndicator(color:Colors.lightBlue,)),
+                defaultChild: const Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.lightBlue,
+                )),
                 itemBuilder: (context, snapshot, animation, index) {
                   return ListTile(
                     title: Text(snapshot.child('Title').value.toString()),
