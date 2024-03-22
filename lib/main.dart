@@ -2,8 +2,9 @@
 import 'dart:async';
 import 'package:firebase_app/firebase_options.dart';
 import 'package:firebase_app/notifications_services.dart';
+import 'package:firebase_app/ui/auth/firestore/firestore_list_screen.dart';
 import 'package:firebase_app/ui/auth/login_screen.dart';
-import 'package:firebase_app/ui/auth/posts/posts_screen.dart';
+//import 'package:firebase_app/ui/auth/posts/posts_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                const PostScreen()), // Replace MyApp() with your main app widget
+                const FireStoreScreen()), // Replace MyApp() with your main app widget
       ),
     ); 
     }else{
