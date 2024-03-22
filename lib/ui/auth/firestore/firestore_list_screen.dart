@@ -1,4 +1,5 @@
 // ignore_for_file: override_on_non_overriding_member
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app/ui/auth/firestore/add_firestore_data.dart';
 import 'package:firebase_app/ui/auth/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +15,7 @@ class FireStoreScreen extends StatefulWidget {
 class _FireStoreScreenState extends State<FireStoreScreen> {
   @override
   final auth = FirebaseAuth.instance;
-
+  final fireStore = FirebaseFirestore.instance.collection('users').snapshots();
   final editController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -59,15 +60,30 @@ class _FireStoreScreenState extends State<FireStoreScreen> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return const ListTile(
-                    title: Text('Ajay'),
-                  );
-                }),
+          const SizedBox(
+            height: 10,
           ),
+          StreamBuilder<QuerySnapshot>(
+              stream: fireStore,
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState== ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return const Text('error');
+                    }
+                return Expanded(
+                  child: ListView.builder(
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        return  ListTile(
+                          title: Text(snapshot.data!.docs[index]["title"].toString()),
+                          subtitle:Text(snapshot.data!.docs[index]["id"].toString()),
+                        );
+                      }),
+                );
+              })
         ],
       ),
     );
