@@ -1,16 +1,20 @@
-// ignore_for_file: prefer_final_fields, unused_field, unnecessary_import, deprecated_member_use, avoid_print, unnecessary_null_comparison
+// ignore_for_file: prefer_final_fields, unused_field, unnecessary_import, deprecated_member_use, avoid_print, unnecessary_null_comparison, use_build_context_synchronously, unused_element
 
 //import 'package:firebase_app/notification_services.dart';
 import 'package:firebase_app/ui/auth/login_with_phone_number.dart';
 import 'package:firebase_app/ui/auth/posts/posts_screen.dart';
 import 'package:firebase_app/ui/auth/sign_up_screen.dart';
+import 'package:firebase_app/ui/auth/upload_image.dart';
 import 'package:firebase_app/ui/forgot_password.dart';
+//import 'package:firebase_app/ui/google_sign_in_service.dart';
 import 'package:firebase_app/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,6 +24,38 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  Future<void> _signInWithGoogle() async {
+    try {
+      // Trigger the Google sign-in flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        // User canceled the sign-in process
+        return;
+      }
+
+      // Obtain the GoogleSignInAuthentication object
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Navigate to the next screen after successful sign-in
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const UploadImageScreen()));
+    } catch (e) {
+      // Handle sign-in errors
+      print(e.toString());
+    }
+  }
+
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
@@ -208,6 +244,46 @@ class _LoginScreenState extends State<LoginScreen> {
                             const BorderRadius.all(Radius.circular(50))),
                     child: const Center(
                       child: Text('Login with mobile'),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                InkWell(
+                  onTap: () {
+                    _signInWithGoogle();
+                    //   AuthService().signInWithGoogel();
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) =>
+                    //             const LoginWithPhoneNumber()));
+                  },
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(50))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: SvgPicture.asset(
+                            'assets/icons/google_icon.svg',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        const Center(
+                          child: Text('Login with Google'),
+                        ),
+                      ],
                     ),
                   ),
                 )

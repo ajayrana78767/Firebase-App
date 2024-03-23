@@ -1,11 +1,13 @@
-// ignore_for_file: prefer_final_fields, unused_field, unnecessary_import, avoid_print
+// ignore_for_file: prefer_final_fields, unused_field, unnecessary_import, avoid_print, unused_local_variable
 
+import 'package:firebase_app/ui/provider/google_sign_in.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -33,6 +35,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+     final provider=Provider.of<GoogleSignInProvider>(context,listen: false);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -174,7 +177,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   InkWell(
                     onTap: () {
-                      
+                      print('hello');
+                     
+                      provider.googleLogin();
                     },
                     child: Container(
                       height: 40,
