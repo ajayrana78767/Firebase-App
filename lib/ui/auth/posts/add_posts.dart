@@ -3,7 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class AddPostScreen extends StatefulWidget {
-  const AddPostScreen({super.key});
+  const AddPostScreen({Key? key}) : super(key: key);
 
   @override
   State<AddPostScreen> createState() => _AddPostScreenState();
@@ -86,4 +86,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
       ),
     );
   }
+
+  
 }

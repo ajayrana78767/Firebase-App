@@ -2,13 +2,15 @@
 import 'dart:async';
 import 'package:firebase_app/firebase_options.dart';
 import 'package:firebase_app/notifications_services.dart';
-import 'package:firebase_app/ui/auth/firestore/firestore_list_screen.dart';
+//import 'package:firebase_app/ui/auth/firestore/firestore_list_screen.dart';
 import 'package:firebase_app/ui/auth/login_screen.dart';
+import 'package:firebase_app/ui/auth/upload_image.dart';
 //import 'package:firebase_app/ui/auth/posts/posts_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +18,11 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Set up and activate the AppCheckProvider for each platform
+
+  await FirebaseAppCheck.instance.activate();
+
   runApp(const MyApp());
 }
 
@@ -62,32 +69,31 @@ class _SplashScreenState extends State<SplashScreen> {
           print("device token"),
           print(value),
         });
-   
+
     // check user is alreday login or not
     final auth = FirebaseAuth.instance;
-    final user=auth.currentUser;
-    if (user!=null) {
+    final user = auth.currentUser;
+    if (user != null) {
       Timer(
-      const Duration(seconds: 2), // Change the duration as needed
-      () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                const FireStoreScreen()), // Replace MyApp() with your main app widget
-      ),
-    ); 
-    }else{
-       Timer(
-      const Duration(seconds: 2), // Change the duration as needed
-      () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                const LoginScreen()), // Replace MyApp() with your main app widget
-      ),
-    );
+        const Duration(seconds: 2), // Change the duration as needed
+        () => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  const UploadImageScreen()), // Replace MyApp() with your main app widget
+        ),
+      );
+    } else {
+      Timer(
+        const Duration(seconds: 2), // Change the duration as needed
+        () => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  const LoginScreen()), // Replace MyApp() with your main app widget
+        ),
+      );
     }
-   
   }
 
   @override
